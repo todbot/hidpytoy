@@ -26,7 +26,7 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
         #self.textSendData.returnPressed.connect(self.onSendReport)
         self.textGetData.ensureCursorVisible()  # make sure scrolls to bottom
 
-        self.textGetData.setStyleSheet("font: 14pt \"Courier\";")
+        self.textGetData.setStyleSheet('font: 14pt "Courier";')
 
         self.enableButtons(False)
 
@@ -44,6 +44,7 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
         devs = hid.enumerate()
         #devstrs = list(map(lambda d:d.get('serial_number'), devs))
         self.deviceList.clear()
+        devs.sort( key=lambda x: (x['vendor_id'],x['product_id'],x.get('usage',0)), reverse=True )
         for d in devs:
            # str = f"vid/pid:{d['vendor_id']}/{d['product_id']} usage:{d['usage_page']}/{d['usage']} {d['manufacturer_string']} {d['product_string']}"
             str = f"{d['manufacturer_string']} {d['product_string']}  vid/pid:{d['vendor_id']}/{d['product_id']} usage:{d['usage_page']}/{d['usage']} "
@@ -77,7 +78,7 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
             except OSError as e:
                 self.status(f"connect error: {e}")
 
-    def parseUserBuf(bufraw,bufsize):
+    def parseUserBuf(self,bufraw,bufsize):
         # do sanity checks on user-typed bufraw
         buf = [0] * bufsize  # make fixed-size buffer
         try:
@@ -102,7 +103,7 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
     def onSendOutReport(self):
         bufsize = self.spinSizeOut.value()
         bufraw = self.textSendData.text()
-        buf = parseUserBuf(bufraw, bufsize)
+        buf = self.parseUserBuf(bufraw, bufsize)
         self.status(f"Sending {bufsize}-byte OUT report:{buf}")
         try:
             self.device.write(buf)
@@ -112,7 +113,7 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
     def onSendFeatureReport(self):
         bufsize = self.spinSizeOut.value()
         bufraw = self.textSendData.text()
-        buf = parseUserBuf(bufraw, bufsize)
+        buf = self.parseUserBuf(bufraw, bufsize)
         self.status(f"Sending {bufsize}-byte FEATURE report:{buf}")
         try:
             self.device.send_feature_report(buf)

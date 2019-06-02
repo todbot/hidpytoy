@@ -15,13 +15,15 @@ cd hidpytoy
 
 python3 -m venv venv
 source venv/bin/activate
-# on Windows powershell:
-# py -3 -m venv venv
-#  .\venv\scripts\activate.ps1
+# on Windows powershell, and must be Python 3.6, not 3.7:
+# py -3.6 -m venv venv
+# .\venv\scripts\activate.ps1
 
 pip install fbs
 pip install PyQt5==5.9.2
 pip install hidapi
+# or equivalently
+pip install fbs PyQt5==5.9.2 hidapi
 
 # run the app
 fbs run
