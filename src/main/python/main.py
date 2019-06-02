@@ -1,10 +1,9 @@
 #from fbs_runtime.application_context import ApplicationContext
-#import PyQt5
 
 from fbs_runtime.application_context import ApplicationContext
 from PyQt5 import QtCore, uic, QtWidgets
+#from PyQt5.QtCore import pyqtSlot
 
-#import requests
 import sys
 
 # Generate with:  pyuic5 HIDToyWindow.ui -o HIDToyWindow.py
@@ -12,8 +11,6 @@ from HIDToyWindow import Ui_HIDToyWindow
 
 # from blink1.blink1 import Blink1
 import hid
-#from easyhid import Enumeration
-
 
 class MyHIDToyWindow(Ui_HIDToyWindow):
     def __init__(self):
@@ -31,7 +28,6 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
 
     def onReScan(self):
         devs = hid.enumerate()
-        #devstrs=[]
         #devstrs = list(map(lambda d:d.get('serial_number'), devs))
         self.deviceList.clear()
         for d in devs:
@@ -122,33 +118,10 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
             except OSError as e:
                 self.status(f"Send feature report error: {e}")
 
-#
-# if __name__ == '__main__':
-#     appctxt = ApplicationContext()
-#     stylesheet = appctxt.get_resource('styles.qss')
-#     appctxt.app.setStyleSheet(open(stylesheet).read())
-#     window = MainWindow()
-#     window.show()
-#     exit_code = appctxt.app.exec_()
-#     sys.exit(exit_code)
-#
-
-
-# if __name__ == "__main__":
-#     app = QtWidgets.QApplication(sys.argv)
-#     MainWindow = QtWidgets.QMainWindow()
-#     ui = MyHIDToyWindow()
-#     ui.setupUi(MainWindow)
-#     ui.connectMySignals()
-#     ui.onReScan()
-#     MainWindow.show()
-#     sys.exit(app.exec_())
 
 if __name__ == '__main__':
     appctxt = ApplicationContext()       # 1. Instantiate ApplicationContext
-    # window = QMainWindow()
-    # window.resize(250, 150)
-    # window.show()
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = MyHIDToyWindow()
