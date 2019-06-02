@@ -145,7 +145,7 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
                 for s in textwrap.wrap(bufstr, width=3*16):
                     print(f"s={s}")
                     self.textGetData.append(s)
-                self.textGetData.append("")
+                self.textGetData.append("") # add newline
         except OSError as e:
             self.status(f"Get IN report error: {e}")
 
