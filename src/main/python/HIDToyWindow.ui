@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>696</width>
-    <height>550</height>
+    <width>695</width>
+    <height>629</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>310</y>
-      <width>651</width>
-      <height>191</height>
+      <y>280</y>
+      <width>661</width>
+      <height>291</height>
      </rect>
     </property>
     <property name="title">
@@ -31,15 +31,15 @@
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>631</width>
-       <height>151</height>
+       <width>641</width>
+       <height>251</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <widget class="QPushButton" name="buttonGetReport">
+         <widget class="QPushButton" name="buttonReadInReport">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -47,22 +47,22 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Get Report</string>
+           <string>Read IN Reports</string>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+         <widget class="QPushButton" name="buttonGetFeatureReport">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
+          <property name="text">
+           <string>Get FEATURE Report</string>
           </property>
-         </spacer>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_10">
@@ -95,6 +95,32 @@
            <number>0</number>
           </property>
          </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <widget class="QLabel" name="label_7">
@@ -131,52 +157,10 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLabel" name="label_9">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>reportType:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="buttonInTypeIn">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>  IN</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="buttonInTypeFeature">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>FEATURE</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
        </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4"/>
       </item>
       <item>
        <widget class="QTextEdit" name="textGetData"/>
@@ -188,9 +172,9 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>160</y>
-      <width>651</width>
-      <height>151</height>
+      <y>150</y>
+      <width>661</width>
+      <height>131</height>
      </rect>
     </property>
     <property name="title">
@@ -201,20 +185,27 @@
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>631</width>
-       <height>111</height>
+       <width>641</width>
+       <height>91</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QPushButton" name="buttonSendReport">
+         <widget class="QPushButton" name="buttonSendOutReport">
           <property name="enabled">
            <bool>true</bool>
           </property>
           <property name="text">
-           <string>Send Report</string>
+           <string>Send OUT Report</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="buttonSendFeatureReport">
+          <property name="text">
+           <string>Send FEATURE Report</string>
           </property>
          </widget>
         </item>
@@ -266,51 +257,6 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLabel" name="label_4">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>reportType:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="buttonOutTypeOut">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>OUT</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="buttonOutTypeFeature">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>FEATURE</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
       <item>
@@ -351,8 +297,8 @@
      <rect>
       <x>20</x>
       <y>50</y>
-      <width>651</width>
-      <height>101</height>
+      <width>661</width>
+      <height>91</height>
      </rect>
     </property>
     <property name="title">
@@ -363,8 +309,8 @@
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>631</width>
-       <height>60</height>
+       <width>641</width>
+       <height>51</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -408,7 +354,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>20</y>
+      <y>10</y>
       <width>651</width>
       <height>31</height>
      </rect>
@@ -429,7 +375,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>696</width>
+     <width>695</width>
      <height>22</height>
     </rect>
    </property>

@@ -30,5 +30,7 @@ fbs freeze
 # 1. Install Qt Designer from https://build-system.fman.io/qt-designer-download
 # then save .UI file and run:
 pyuic5 HIDToyWindow.ui -o HIDToyWindow.py
- 
+
+# or when working with it in another location:
+cp ~/Desktop/HIDToyWindow.ui src/main/python/ && pyuic5 src/main/python/HIDToyWindow.ui -o src/main/python/HIDToyWindow.py 
 ```

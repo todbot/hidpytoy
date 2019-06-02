@@ -5,6 +5,7 @@ from PyQt5 import QtCore, uic, QtWidgets
 #from PyQt5.QtCore import pyqtSlot
 
 import sys
+import textwrap
 
 # Generate with:  pyuic5 HIDToyWindow.ui -o HIDToyWindow.py
 from HIDToyWindow import Ui_HIDToyWindow
@@ -14,17 +15,30 @@ import hid
 class MyHIDToyWindow(Ui_HIDToyWindow):
     def __init__(self):
         self.isConnected = False
-        self.otherValue = "todbot"
 
     def connectMySignals(self):
         self.buttonReScan.clicked.connect(self.onReScan)
         self.buttonConnect.clicked.connect(self.onConnect)
-        self.buttonSendReport.clicked.connect(self.onSendReport)
-        self.buttonGetReport.clicked.connect(self.onGetReport)
-        self.textSendData.returnPressed.connect(self.onSendReport)
+        self.buttonSendOutReport.clicked.connect(self.onSendOutReport)
+        self.buttonSendFeatureReport.clicked.connect(self.onSendFeatureReport)
+        self.buttonGetFeatureReport.clicked.connect(self.onGetFeatureReport)
+        self.buttonReadInReport.clicked.connect(self.onReadInReport)
+        #self.textSendData.returnPressed.connect(self.onSendReport)
+        self.textGetData.ensureCursorVisible()  # make sure scrolls to bottom
 
-        # self.buttonSendReport.setEnabled(False)
-        # self.buttonGetReport.setEnabled(False)
+        self.textGetData.setStyleSheet("font: 14pt \"Courier\";")
+
+        self.enableButtons(False)
+
+    def enableButtons(self,state):
+        self.buttonSendOutReport.setEnabled(state)
+        self.buttonSendFeatureReport.setEnabled(state)
+        self.buttonGetFeatureReport.setEnabled(state)
+        self.buttonReadInReport.setEnabled(state)
+
+    def close(self): # not used yet
+        self.isConnected = False
+        self.enableButtons(False)
 
     def onReScan(self):
         devs = hid.enumerate()
@@ -45,8 +59,7 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
             self.isConnected = False
             print("disconnecting...")
             self.buttonConnect.setText("Connect")
-            self.buttonSendReport.setEnabled(False)
-            self.buttonGetReport.setEnabled(False)
+            self.enableButtons(False)
             try:
                 self.device.close()
                 self.status(f"disconnected.")
@@ -54,8 +67,7 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
                 self.status(f"disconnect error: {e}")
         else:
             self.buttonConnect.setText("Disconnect")
-            self.buttonSendReport.setEnabled(True)
-            self.buttonGetReport.setEnabled(True)
+            self.enableButtons(True)
             try:
                 self.device = hid.device()
                 hidpath = self.deviceList.currentData()
@@ -65,16 +77,11 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
             except OSError as e:
                 self.status(f"connect error: {e}")
 
-    def onSendReport(self):
-        print("SendReport!")
-        self.statusbar.showMessage("hello!")
-        bufsize = self.spinSizeOut.value()
-
-        buf = [0] * bufsize
-
+    def parseUserBuf(bufraw,bufsize):
         # do sanity checks on user-typed bufraw
+        buf = [0] * bufsize  # make fixed-size buffer
         try:
-            bufraw = eval( self.textSendData.text(), {}) # safer eval
+            bufraw = eval( bufraw, {}) # safer eval
             print('bufraw:',bufraw)
             if type(bufraw) is list or type(bufraw) is tuple:
                 for i in range(0,len(buf)):
@@ -84,46 +91,63 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
                 self.status("Parse error: input is not a list")
         except Exception as e:
             self.status(f"Parse error: {e}")
-            return
+            return []
 
         # copy over user-typed bufraw to fixed-size buf
         for i in range(0, min(bufsize,len(bufraw))):
             buf[i] = bufraw[i]
 
-        #buf = [1, 99, 255,0,255,0,0,0,0]
-        if self.buttonOutTypeFeature.isChecked():
-            self.status(f"Sending {bufsize}-byte FEATURE report:{buf}")
-            try:
-                self.device.send_feature_report(buf)
-            except OSError as e:
-                self.status(f"Send feature report error: {e}")
-        else:
-            self.status(f"Sending {bufsize}-byte OUT report:{buf}")
-            try:
-                self.device.write(buf)
-            except OSError as e:
-                self.status(f"Send out report error: {e}")
+        return buf
 
-    def onGetReport(self):
+    def onSendOutReport(self):
+        bufsize = self.spinSizeOut.value()
+        bufraw = self.textSendData.text()
+        buf = parseUserBuf(bufraw, bufsize)
+        self.status(f"Sending {bufsize}-byte OUT report:{buf}")
+        try:
+            self.device.write(buf)
+        except OSError as e:
+            self.status(f"Send out report error: {e}")
+
+    def onSendFeatureReport(self):
+        bufsize = self.spinSizeOut.value()
+        bufraw = self.textSendData.text()
+        buf = parseUserBuf(bufraw, bufsize)
+        self.status(f"Sending {bufsize}-byte FEATURE report:{buf}")
+        try:
+            self.device.send_feature_report(buf)
+        except OSError as e:
+            self.status(f"Send feature report error: {e}")
+
+    def onGetFeatureReport(self):
         bufsize = self.spinSizeIn.value()
         report_id = self.spinReportId.value()
 
-        if self.buttonInTypeFeature.isChecked():
-            self.status(f"Getting FEATURE report of {bufsize} bytes on reportId {report_id}")
-            try:
-                buf = self.device.get_feature_report(report_id,bufsize)
-                print('buf',buf)
-                print("read: " + ",".join('0x%02x' % v for v in buf))
-                bufstr = ",".join('0x%02x' % v for v in buf)
-                self.textGetData.append(f"\n{bufstr}")
-            except Exception as e:
-                self.status(f"Send feature report error: {e}")
-        else:
-            self.status("Getting OUT report of {bufsize} bytes on reportId {report_id}")
-            try:
-                buf = self.device.read(buf)
-            except Exception as e:
-                self.status(f"Send feature report error: {e}")
+        self.status(f"Getting {bufsize}-byte FEATURE report, reportId {report_id}")
+        try:
+            buf = self.device.get_feature_report(report_id,bufsize)
+            print('buf',buf)
+            bufstr = " ".join('%02x' % v for v in buf)
+            self.textGetData.append(f"\n{bufstr}")
+        except Exception as e:
+            self.status(f"Get FEATURE report error: {e}")
+
+    def onReadInReport(self):
+        bufsize = self.spinSizeIn.value()
+        timeout_ms = 200
+        self.status(f"Getting {bufsize}-byte IN report...")
+        try:
+            buf = self.device.read(bufsize, timeout_ms)
+            self.status(f"Getting {bufsize}-byte IN report... got {len(buf)} bytes")
+            if len(buf) > 0:
+                bufstr = " ".join('%02x' % v for v in buf)
+                print('bufstr',bufstr)
+                for s in textwrap.wrap(bufstr, width=3*16):
+                    print(f"s={s}")
+                    self.textGetData.append(s)
+                self.textGetData.append("")
+        except OSError as e:
+            self.status(f"Get IN report error: {e}")
 
 
 if __name__ == '__main__':
