@@ -9,7 +9,6 @@ import sys
 # Generate with:  pyuic5 HIDToyWindow.ui -o HIDToyWindow.py
 from HIDToyWindow import Ui_HIDToyWindow
 
-# from blink1.blink1 import Blink1
 import hid
 
 class MyHIDToyWindow(Ui_HIDToyWindow):
@@ -22,9 +21,10 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
         self.buttonConnect.clicked.connect(self.onConnect)
         self.buttonSendReport.clicked.connect(self.onSendReport)
         self.buttonGetReport.clicked.connect(self.onGetReport)
+        self.textSendData.returnPressed.connect(self.onSendReport)
 
-        self.buttonSendReport.setEnabled(False)
-        self.buttonGetReport.setEnabled(False)
+        # self.buttonSendReport.setEnabled(False)
+        # self.buttonGetReport.setEnabled(False)
 
     def onReScan(self):
         devs = hid.enumerate()
@@ -68,36 +68,43 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
     def onSendReport(self):
         print("SendReport!")
         self.statusbar.showMessage("hello!")
+        bufsize = self.spinSizeOut.value()
 
+        buf = [0] * bufsize
+
+        # do sanity checks on user-typed bufraw
         try:
-            buf = eval( self.textSendData.text(), {})
-            print('buf:',buf)
-            if type(buf) is list or type(buf) is tuple:
+            bufraw = eval( self.textSendData.text(), {}) # safer eval
+            print('bufraw:',bufraw)
+            if type(bufraw) is list or type(bufraw) is tuple:
                 for i in range(0,len(buf)):
                     if type(buf[i]) is str:
                         buf[i] = 0
             else:
-                print("ERROR")
+                self.status("Parse error: input is not a list")
         except Exception as e:
             self.status(f"Parse error: {e}")
             return
 
+        # copy over user-typed bufraw to fixed-size buf
+        for i in range(0, min(bufsize,len(bufraw))):
+            buf[i] = bufraw[i]
+
         #buf = [1, 99, 255,0,255,0,0,0,0]
         if self.buttonOutTypeFeature.isChecked():
-            self.status(f"Sending FEATURE report:{buf}")
+            self.status(f"Sending {bufsize}-byte FEATURE report:{buf}")
             try:
                 self.device.send_feature_report(buf)
             except OSError as e:
                 self.status(f"Send feature report error: {e}")
         else:
-            self.status(f"Sending OUT report:{buf}")
+            self.status(f"Sending {bufsize}-byte OUT report:{buf}")
             try:
                 self.device.write(buf)
             except OSError as e:
                 self.status(f"Send out report error: {e}")
 
     def onGetReport(self):
-        print("GetReport!")
         bufsize = self.spinSizeIn.value()
         report_id = self.spinReportId.value()
 
@@ -109,13 +116,13 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
                 print("read: " + ",".join('0x%02x' % v for v in buf))
                 bufstr = ",".join('0x%02x' % v for v in buf)
                 self.textGetData.append(f"\n{bufstr}")
-            except OSError as e:
+            except Exception as e:
                 self.status(f"Send feature report error: {e}")
         else:
             self.status("Getting OUT report of {bufsize} bytes on reportId {report_id}")
             try:
                 buf = self.device.read(buf)
-            except OSError as e:
+            except Exception as e:
                 self.status(f"Send feature report error: {e}")
 
 
