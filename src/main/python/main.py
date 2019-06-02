@@ -24,8 +24,9 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
         self.buttonGetFeatureReport.clicked.connect(self.onGetFeatureReport)
         self.buttonReadInReport.clicked.connect(self.onReadInReport)
         #self.textSendData.returnPressed.connect(self.onSendReport)
-        self.textGetData.ensureCursorVisible()  # make sure scrolls to bottom
+        self.comboSendData.activated.connect(self.onComboActivated)
 
+        self.textGetData.ensureCursorVisible()  # make sure scrolls to bottom
         self.textGetData.setStyleSheet('font: 14pt "Courier";')
 
         self.enableButtons(False)
@@ -42,8 +43,8 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
 
     def onReScan(self):
         devs = hid.enumerate()
-        #devstrs = list(map(lambda d:d.get('serial_number'), devs))
         self.deviceList.clear()
+        # revese sort by vid, then pid, then usage (with 0 in case libusb w/ no usage)
         devs.sort( key=lambda x: (x['vendor_id'],x['product_id'],x.get('usage',0)), reverse=True )
         for d in devs:
            # str = f"vid/pid:{d['vendor_id']}/{d['product_id']} usage:{d['usage_page']}/{d['usage']} {d['manufacturer_string']} {d['product_string']}"
@@ -100,10 +101,17 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
 
         return buf
 
+    def onComboActivated(self):
+        print(f"comboActivated! currentText {self.comboSendData.currentText()}")
+        # we don't need this do we?
+
     def onSendOutReport(self):
         bufsize = self.spinSizeOut.value()
-        bufraw = self.textSendData.text()
+        bufraw = self.comboSendData.currentText()
         buf = self.parseUserBuf(bufraw, bufsize)
+        if buf:
+            self.comboSendData.addItem(bufraw)
+
         self.status(f"Sending {bufsize}-byte OUT report:{buf}")
         try:
             self.device.write(buf)
@@ -112,8 +120,11 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
 
     def onSendFeatureReport(self):
         bufsize = self.spinSizeOut.value()
-        bufraw = self.textSendData.text()
+        bufraw = self.comboSendData.currentText()
         buf = self.parseUserBuf(bufraw, bufsize)
+        if buf:
+            self.comboSendData.addItem(bufraw)
+
         self.status(f"Sending {bufsize}-byte FEATURE report:{buf}")
         try:
             self.device.send_feature_report(buf)

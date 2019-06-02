@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>695</width>
-    <height>629</height>
+    <width>700</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>20</x>
       <y>280</y>
       <width>661</width>
-      <height>291</height>
+      <height>261</height>
      </rect>
     </property>
     <property name="title">
@@ -32,7 +32,7 @@
        <x>10</x>
        <y>30</y>
        <width>641</width>
-       <height>251</height>
+       <height>211</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -40,12 +40,6 @@
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
          <widget class="QPushButton" name="buttonReadInReport">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="text">
            <string>Read IN Reports</string>
           </property>
@@ -53,12 +47,6 @@
         </item>
         <item>
          <widget class="QPushButton" name="buttonGetFeatureReport">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="text">
            <string>Get FEATURE Report</string>
           </property>
@@ -172,9 +160,9 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>150</y>
+      <y>140</y>
       <width>661</width>
-      <height>131</height>
+      <height>141</height>
      </rect>
     </property>
     <property name="title">
@@ -186,10 +174,20 @@
        <x>10</x>
        <y>30</y>
        <width>641</width>
-       <height>91</height>
+       <height>101</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QComboBox" name="comboSendData">
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+        <property name="insertPolicy">
+         <enum>QComboBox::InsertAtTop</enum>
+        </property>
+       </widget>
+      </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
@@ -240,12 +238,6 @@
         </item>
         <item>
          <widget class="QSpinBox" name="spinSizeOut">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="minimum">
            <number>1</number>
           </property>
@@ -260,20 +252,6 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QLineEdit" name="textSendData">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
        <widget class="QLabel" name="label_8">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -282,7 +260,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Data format is Python list, e.g. &quot;(1,99,0xff,0x00,0xff,0,0)&quot;. First byte is reportId (if using reportIds)</string>
+         <string>Send data format is Python list, e.g. &quot;1,99,0xff,0,0&quot;. 1st byte is reportId (if using reportIds)</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -375,7 +353,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>695</width>
+     <width>700</width>
      <height>22</height>
     </rect>
    </property>
