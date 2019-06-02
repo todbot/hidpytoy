@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'HIDToyWindow.ui'
+# Form implementation generated from reading ui file 'src/main/python/HIDToyWindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
@@ -269,7 +269,7 @@ class Ui_HIDToyWindow(object):
         self.boxDevices.setTitle(_translate("HIDToyWindow", "Devices:"))
         self.buttonReScan.setText(_translate("HIDToyWindow", "Rescan"))
         self.buttonConnect.setText(_translate("HIDToyWindow", "Connect"))
-        self.labelTitle.setText(_translate("HIDToyWindow", "<html><head/><body><p><span style=\" font-size:18pt; font-weight:600;\">HIDToy</span>  - List HID devices, Send and receive data to them</p></body></html>"))
+        self.labelTitle.setText(_translate("HIDToyWindow", "<html><head/><body><p><span style=\" font-size:18pt; font-weight:600;\">HIDPyToy</span> - List HID devices. Send data. Receive data. Use IN, OUT, or FEATURE reports.</p></body></html>"))
         self.menuFile.setTitle(_translate("HIDToyWindow", "File"))
         self.menuEdit.setTitle(_translate("HIDToyWindow", "Edit"))
         self.menuView.setTitle(_translate("HIDToyWindow", "View"))
