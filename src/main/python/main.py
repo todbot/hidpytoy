@@ -1,8 +1,10 @@
-#from fbs_runtime.application_context import ApplicationContext
+#
+# HIDPyToy -
+#   2019 Tod E. Kurt, todbot.com 
+#
 
 from fbs_runtime.application_context import ApplicationContext
 from PyQt5 import QtCore, uic, QtWidgets
-#from PyQt5.QtCore import pyqtSlot
 
 import sys
 import textwrap
