@@ -1,12 +1,21 @@
-HIDPyToy
+HIDPyToy - A simple tool to play with USB HID devices
 ====================
-<img src="./docs/screenshot1.png">
+<img src="./docs/screenshot1a.png">
 
-A simple tool to play with USB HID devices.
 
-Written in Python3, with [PyQt5](https://build-system.fman.io/pyqt5-tutorial)
+Written in Python3 with [PyQt5](https://build-system.fman.io/pyqt5-tutorial)
 and built with [fbs](https://github.com/mherrmann/fbs-tutorial).
 
+** Download **
+
+Pre-build executables are available on the [hidpytoy releases page](https://github.com/todbot/hidpytoy/releases) for:
+
+- Mac OS X
+- Windows x64
+
+
+
+Be sure to see [fbs troubleshooting page](https://build-system.fman.io/troubleshooting)
 
 To install for development (until I get setup.py up):
 ```shell
@@ -15,6 +24,7 @@ cd hidpytoy
 
 python3 -m venv venv
 source venv/bin/activate
+
 # on Windows powershell, and must be Python 3.6, not 3.7:
 # py -3.6 -m venv venv
 # .\venv\scripts\activate.ps1
