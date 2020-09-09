@@ -3,7 +3,7 @@
 #   2019 Tod E. Kurt, todbot.com 
 #
 
-from fbs_runtime.application_context import ApplicationContext
+from fbs_runtime.application_context.PyQt5 import ApplicationContext
 from PyQt5 import QtCore, uic, QtWidgets
 
 import sys
