@@ -71,5 +71,4 @@ dist: notarize-mac
 clean:
 	rm -rf dist/ build/
 	rm -rf src/main/python/__pycache__
-	rm -f src/main/python/HIDToyWindow.py
 	rm -f $(APP_NAME)-$(APP_VERSION).zip
