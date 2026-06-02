@@ -16,13 +16,20 @@ AZURE_TENANT_ID   ?=
 AZURE_CLIENT_ID   ?=
 AZURE_CLIENT_SECRET ?=
 
-.PHONY: run regen-ui build-mac build-win build-linux codesign-mac notarize-mac sign-win dist-win dist clean
+HIDTOYWINDOW_PY = src/main/python/HIDToyWindow.py
+HIDTOYWINDOW_UI = src/main/python/HIDToyWindow.ui
 
-run:
+.PHONY: all run regen-ui build-mac build-win build-linux codesign-mac notarize-mac sign-win dist-win dist clean
+
+all: $(HIDTOYWINDOW_PY)
+
+$(HIDTOYWINDOW_PY): $(HIDTOYWINDOW_UI)
+	pyside6-uic $< -o $@
+
+regen-ui: $(HIDTOYWINDOW_PY)
+
+run: $(HIDTOYWINDOW_PY)
 	python src/main/python/main.py
-
-regen-ui:
-	pyside6-uic src/main/python/HIDToyWindow.ui -o src/main/python/HIDToyWindow.py
 
 build-mac:
 	pyinstaller --clean --noconfirm $(SPEC_FILE)

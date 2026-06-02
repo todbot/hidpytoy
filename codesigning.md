@@ -44,6 +44,16 @@ make notarize-mac    # submit to Apple, wait, staple ticket
 
 Notarization can take a few minutes. The `--wait` flag in the Makefile blocks until Apple returns a result.
 
+**GitHub Actions secrets required** (Settings → Secrets and variables → Actions):
+
+| Secret | Description |
+|--------|-------------|
+| `MACOS_CERTIFICATE` | Developer ID Application certificate exported as `.p12`, base64-encoded: `base64 -i cert.p12 \| pbcopy` |
+| `MACOS_CERTIFICATE_PWD` | Password used when exporting the `.p12` |
+| `APPLE_ID` | Your Apple ID email address |
+| `APPLE_APP_SPECIFIC_PASSWORD` | App-specific password for notarytool (create at [appleid.apple.com](https://appleid.apple.com)) |
+| `APPLE_TEAM_ID` | Your 10-character Apple Developer Team ID |
+
 ## Windows — Azure Trusted Signing
 
 Windows executables are signed using [Azure Trusted Signing](https://learn.microsoft.com/en-us/azure/trusted-signing/). Signing runs automatically in CI on releases, but can also be done locally.
@@ -78,4 +88,12 @@ make build-win
 make sign-win
 ```
 
-**In GitHub Actions**, signing is handled by the `azure/trusted-signing-action` step, triggered on releases or manual dispatch. The required secrets are `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, and `AZURE_CLIENT_SECRET`.
+**In GitHub Actions**, signing is handled by the `azure/trusted-signing-action` step, triggered on releases or manual dispatch.
+
+**GitHub Actions secrets required** (Settings → Secrets and variables → Actions):
+
+| Secret | Description |
+|--------|-------------|
+| `AZURE_TENANT_ID` | Azure Active Directory tenant ID |
+| `AZURE_CLIENT_ID` | Client ID of the service principal with Trusted Signing Certificate Profile Signer role |
+| `AZURE_CLIENT_SECRET` | Client secret for the service principal |

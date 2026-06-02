@@ -1,0 +1,185 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      sign:
+        description: 'Codesign and notarize builds'
+        type: boolean
+        default: false
+
+jobs:
+
+  # ---------------------------------------------------------------------------
+  # macOS
+  # ---------------------------------------------------------------------------
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Generate UI
+        run: pyside6-uic src/main/python/HIDToyWindow.ui -o src/main/python/HIDToyWindow.py
+
+      - name: Build
+        run: make build-mac
+
+      - name: Import signing certificate
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.sign)
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+        run: |
+          echo "$MACOS_CERTIFICATE" | base64 --decode > certificate.p12
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" \
+            -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+          rm certificate.p12
+
+      - name: Codesign
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.sign)
+        run: |
+          SIGNING_ID=$(security find-identity -v -p codesigning build.keychain \
+            | grep "Developer ID Application" | head -1 | sed 's/.*"\(.*\)"/\1/')
+          echo "Signing with: $SIGNING_ID"
+          codesign --deep --force --options runtime \
+            --entitlements entitlements.plist \
+            --sign "$SIGNING_ID" \
+            dist/HIDPyToy.app
+          codesign --verify --verbose dist/HIDPyToy.app
+
+      - name: Notarize
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.sign)
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          ditto -c -k --keepParent dist/HIDPyToy.app dist/HIDPyToy-notarize.zip
+          xcrun notarytool submit dist/HIDPyToy-notarize.zip \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+          xcrun stapler staple dist/HIDPyToy.app
+          rm dist/HIDPyToy-notarize.zip
+
+      - name: Package
+        run: ditto -c -k --keepParent dist/HIDPyToy.app dist/HIDPyToy-mac.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HIDPyToy-mac
+          path: dist/HIDPyToy-mac.zip
+
+  # ---------------------------------------------------------------------------
+  # Windows
+  # ---------------------------------------------------------------------------
+  build-windows:
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up make (msys2)
+        run: |
+          echo 'C:\msys64\usr\bin' | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Generate UI
+        run: pyside6-uic src/main/python/HIDToyWindow.ui -o src/main/python/HIDToyWindow.py
+
+      - name: Build
+        shell: bash
+        run: make build-win
+
+      - name: Sign (Azure Trusted Signing)
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.sign)
+        uses: azure/trusted-signing-action@v0.4.0
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: https://wus2.codesigning.azure.net/
+          trusted-signing-account-name: thingm-signing
+          certificate-profile-name: ThingMProfile
+          files-folder: dist/HIDPyToy
+          files-folder-filter: exe
+          files-folder-recurse: false
+
+      - name: Package
+        shell: bash
+        run: cd dist && zip -r HIDPyToy-windows.zip HIDPyToy/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HIDPyToy-windows
+          path: dist/HIDPyToy-windows.zip
+
+  # ---------------------------------------------------------------------------
+  # Linux
+  # ---------------------------------------------------------------------------
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install system dependencies
+        run: sudo apt-get install -y libhidapi-hidraw0 libhidapi-libusb0
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Generate UI
+        run: pyside6-uic src/main/python/HIDToyWindow.ui -o src/main/python/HIDToyWindow.py
+
+      - name: Build
+        run: make build-linux
+
+      - name: Package
+        run: cd dist && zip -r HIDPyToy-linux.zip HIDPyToy/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HIDPyToy-linux
+          path: dist/HIDPyToy-linux.zip
