@@ -29,6 +29,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
@@ -106,6 +107,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
       - name: Set up make (msys2)
         run: |
@@ -138,8 +140,7 @@ jobs:
           files-folder-recurse: false
 
       - name: Package
-        shell: bash
-        run: cd dist && zip -r HIDPyToy-windows.zip HIDPyToy/
+        run: Compress-Archive -Path dist\HIDPyToy -DestinationPath dist\HIDPyToy-windows.zip
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -160,6 +161,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
       - name: Install system dependencies
         run: sudo apt-get install -y libhidapi-hidraw0 libhidapi-libusb0
