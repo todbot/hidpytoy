@@ -2,68 +2,76 @@ HIDPyToy - A simple tool to play with USB HID devices
 ====================
 <img src="./docs/screenshot1a.png">
 
-Written in Python3 with [PyQt5](https://build-system.fman.io/pyqt5-tutorial)
-and built with [fbs](https://github.com/mherrmann/fbs-tutorial).
+Written in Python 3 with [PySide6](https://doc.qt.io/qtforpython/) and packaged with [PyInstaller](https://pyinstaller.org/).
 
 **Download**
 
-Pre-build executables are available on the [hidpytoy releases page](https://github.com/todbot/hidpytoy/releases) for:
+Pre-built executables are available on the [hidpytoy releases page](https://github.com/todbot/hidpytoy/releases) for:
 
-- [Mac OS X](https://github.com/todbot/hidpytoy/releases)
+- [macOS](https://github.com/todbot/hidpytoy/releases)
 - [Windows x64](https://github.com/todbot/hidpytoy/releases)
+- [Linux x64](https://github.com/todbot/hidpytoy/releases)
 
-**Requirements**
+## Requirements
 
-To install for development (until I get setup.py up):
+Python 3.9 or newer (3.11 or 3.12 recommended). Then:
+
 ```shell
 git clone https://github.com/todbot/hidpytoy
 cd hidpytoy
-```
-
-***Windows***
-```shell
-py -3.6 -m venv venv
-.\venv\scripts\activate.ps1
-pip install -r requirements.txt
-```
-
-***Linux***
-```shell
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-**Running**
+On **Linux**, HID device access typically requires either running as root or adding a udev rule:
 
-***Linux***
 ```shell
-fbs run
+# create /etc/udev/rules.d/99-hid.rules with:
+SUBSYSTEM=="hidraw", MODE="0666"
+# then reload:
+sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
-Hint: If you are running this from a non root user, run instead this command
+## Running
+
 ```shell
-fbspath=$(whereis fbs | cut -d ":" -f2)
-sudo $fbspath run
+source venv/bin/activate        # Windows: venv\Scripts\activate
+make run
+# or directly:
+python src/main/python/main.py
 ```
 
-**Building**
+## Building a standalone executable
 
-fbs freeze
+PyInstaller must be installed in your venv:
 
-**UI Customisation**
-
-***Requirements***
-
-1. Install Qt Designer from https://build-system.fman.io/qt-designer-download
-2. Save .UI file and run
 ```shell
-pyuic5 HIDToyWindow.ui -o HIDToyWindow.py
+pip install pyinstaller
 ```
 
-If you are working from another location
-```
-cp ~/Desktop/HIDToyWindow.ui src/main/python/ && pyuic5 src/main/python/HIDToyWindow.ui -o src/main/python/HIDToyWindow.py
+Then build for your current platform:
+
+```shell
+make build-mac      # produces dist/HIDPyToy.app
+make build-win      # produces dist/HIDPyToy/HIDPyToy.exe
+make build-linux    # produces dist/HIDPyToy/HIDPyToy
 ```
 
-Be sure to check [fbs troubleshooting page](https://build-system.fman.io/troubleshooting)
+Cross-compilation is not supported — build each platform on its native OS.
+
+## Codesigning
+
+See [codesigning.md](codesigning.md) for macOS notarization and Windows Azure Trusted Signing setup and instructions.
+
+## UI Customization
+
+Edit `src/main/python/HIDToyWindow.ui` in [Qt Designer](https://doc.qt.io/qt-6/qtdesigner-manual.html), then regenerate the Python class:
+
+```shell
+make regen-ui
+# or directly:
+pyside6-uic src/main/python/HIDToyWindow.ui -o src/main/python/HIDToyWindow.py
+```
+
+Do not edit `HIDToyWindow.py` by hand — it is overwritten on each regeneration.
