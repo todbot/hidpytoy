@@ -44,10 +44,10 @@ python src/main/python/main.py
 
 ## Building a standalone executable
 
-PyInstaller must be installed in your venv:
+Install the dev dependencies (includes PyInstaller):
 
 ```shell
-pip install pyinstaller
+pip install -r requirements-dev.txt
 ```
 
 Then build for your current platform:

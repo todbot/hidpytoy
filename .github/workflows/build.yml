@@ -33,8 +33,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install pyinstaller
+          pip install -r requirements-dev.txt
 
       - name: Generate UI
         run: pyside6-uic src/main/python/HIDToyWindow.ui -o src/main/python/HIDToyWindow.py
@@ -115,8 +114,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install pyinstaller
+          pip install -r requirements-dev.txt
 
       - name: Generate UI
         run: pyside6-uic src/main/python/HIDToyWindow.ui -o src/main/python/HIDToyWindow.py
@@ -168,8 +166,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install pyinstaller
+          pip install -r requirements-dev.txt
 
       - name: Generate UI
         run: pyside6-uic src/main/python/HIDToyWindow.ui -o src/main/python/HIDToyWindow.py
