@@ -35,7 +35,7 @@ build-mac:
 	pyinstaller --clean --noconfirm $(SPEC_FILE)
 
 build-win:
-	pyinstaller --clean --noconfirm --icon src/main/icons/Icon.ico $(SPEC_FILE)
+	pyinstaller --clean --noconfirm $(SPEC_FILE)
 
 build-linux:
 	pyinstaller --clean --noconfirm $(SPEC_FILE)

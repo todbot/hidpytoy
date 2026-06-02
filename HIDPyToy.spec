@@ -1,4 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
+import sys
+
+if sys.platform == 'darwin':
+    icon = 'src/main/icons/Icon.icns'
+elif sys.platform == 'win32':
+    icon = 'src/main/icons/Icon.ico'
+else:
+    icon = None
 
 a = Analysis(
     ['src/main/python/main.py'],
@@ -25,7 +33,7 @@ exe = EXE(
     strip=False,
     upx=False,
     console=False,
-    icon='src/main/icons/Icon.icns',
+    icon=icon,
 )
 coll = COLLECT(
     exe,
@@ -40,7 +48,7 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='HIDPyToy.app',
-    icon='src/main/icons/Icon.icns',
+    icon=icon,
     bundle_identifier='com.todbot.hidpytoy',
     version='0.1.0',
     info_plist={
