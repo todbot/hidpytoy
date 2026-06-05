@@ -44,14 +44,14 @@ jobs:
       - name: Import signing certificate
         if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.sign)
         env:
-          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
-          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
         run: |
-          echo "$MACOS_CERTIFICATE" | base64 --decode > certificate.p12
+          echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
           security create-keychain -p "" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
-          security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" \
+          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" \
             -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
           rm certificate.p12
@@ -59,12 +59,12 @@ jobs:
       - name: Codesign
         if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.sign)
         run: |
-          SIGNING_ID=$(security find-identity -v -p codesigning build.keychain \
+          APPLE_SIGNING_ID=$(security find-identity -v -p codesigning build.keychain \
             | grep "Developer ID Application" | head -1 | sed 's/.*"\(.*\)"/\1/')
-          echo "Signing with: $SIGNING_ID"
+          echo "Signing with: $APPLE_SIGNING_ID"
           codesign --deep --force --options runtime \
             --entitlements entitlements.plist \
-            --sign "$SIGNING_ID" \
+            --sign "$APPLE_SIGNING_ID" \
             dist/HIDPyToy.app
           codesign --verify --verbose dist/HIDPyToy.app
 
@@ -72,13 +72,13 @@ jobs:
         if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.sign)
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           ditto -c -k --keepParent dist/HIDPyToy.app dist/HIDPyToy-notarize.zip
           xcrun notarytool submit dist/HIDPyToy-notarize.zip \
             --apple-id "$APPLE_ID" \
-            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+            --password "$APPLE_APP_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" \
             --wait
           xcrun stapler staple dist/HIDPyToy.app
