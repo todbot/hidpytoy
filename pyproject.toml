@@ -1,0 +1,26 @@
+[tool.briefcase]
+project_name = "HIDPyToy"
+bundle = "com.todbot"
+version = "0.1.0"
+url = "https://github.com/todbot/hidpytoy"
+license = "MIT"
+author = "Tod Kurt"
+author_email = "tod@todbot.com"
+
+[tool.briefcase.app.hidpytoy]
+formal_name = "HIDPyToy"
+description = "A simple tool to play with USB HID devices"
+sources = ["src/hidpytoy"]
+icon = "src/main/icons/Icon"
+requires = ["PySide6-Essentials>=6.6.0", "hidapi"]
+
+[tool.briefcase.app.hidpytoy.macOS]
+min_os_version = "12.0"
+
+[tool.briefcase.app.hidpytoy.macOS.entitlements]
+"com.apple.security.cs.disable-library-validation" = true
+
+[tool.briefcase.app.hidpytoy.windows]
+
+[tool.briefcase.app.hidpytoy.linux]
+system_requires = ["libhidapi-hidraw0", "libhidapi-libusb0"]

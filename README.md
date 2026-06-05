@@ -2,7 +2,7 @@ HIDPyToy - A simple tool to play with USB HID devices
 ====================
 <img src="./docs/screenshot1a.png">
 
-Written in Python 3 with [PySide6](https://doc.qt.io/qtforpython/) and packaged with [PyInstaller](https://pyinstaller.org/).
+Written in Python 3 with [PySide6](https://doc.qt.io/qtforpython/) and packaged with [BeeWare/Briefcase](https://briefcase.readthedocs.io/).
 
 **Download**
 
@@ -39,12 +39,12 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 source venv/bin/activate        # Windows: venv\Scripts\activate
 make run
 # or directly:
-python src/main/python/main.py
+briefcase dev
 ```
 
 ## Building a standalone executable
 
-Install the dev dependencies (includes PyInstaller):
+Install the dev dependencies (includes Briefcase):
 
 ```shell
 pip install -r requirements-dev.txt
@@ -53,9 +53,9 @@ pip install -r requirements-dev.txt
 Then build for your current platform:
 
 ```shell
-make build-mac      # produces dist/HIDPyToy.app
-make build-win      # produces dist/HIDPyToy/HIDPyToy.exe
-make build-linux    # produces dist/HIDPyToy/HIDPyToy
+make build-mac      # produces build/HIDPyToy/macos/
+make build-win      # produces build/HIDPyToy/windows/
+make build-linux    # produces build/HIDPyToy/linux/
 ```
 
 Cross-compilation is not supported — build each platform on its native OS.
@@ -64,14 +64,20 @@ Cross-compilation is not supported — build each platform on its native OS.
 
 See [codesigning.md](codesigning.md) for macOS notarization and Windows Azure Trusted Signing setup and instructions.
 
+To build + sign + notarize + package as DMG (macOS):
+
+```shell
+make package-mac
+```
+
 ## UI Customization
 
-Edit `src/main/python/HIDToyWindow.ui` in [Qt Designer](https://doc.qt.io/qt-6/qtdesigner-manual.html), then regenerate the Python class:
+Edit `src/hidpytoy/HIDToyWindow.ui` in [Qt Designer](https://doc.qt.io/qt-6/qtdesigner-manual.html), then regenerate the Python class:
 
 ```shell
 make regen-ui
 # or directly:
-pyside6-uic src/main/python/HIDToyWindow.ui -o src/main/python/HIDToyWindow.py
+pyside6-uic src/hidpytoy/HIDToyWindow.ui -o src/hidpytoy/HIDToyWindow.py
 ```
 
 Do not edit `HIDToyWindow.py` by hand — it is overwritten on each regeneration.

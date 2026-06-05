@@ -9,7 +9,7 @@ import sys
 import textwrap
 
 # Generate with:  pyside6-uic HIDToyWindow.ui -o HIDToyWindow.py
-from HIDToyWindow import Ui_HIDToyWindow
+from .HIDToyWindow import Ui_HIDToyWindow
 
 import hid
 
@@ -169,7 +169,7 @@ class MyHIDToyWindow(Ui_HIDToyWindow):
             self.status(f"Get IN report error: {e}")
 
 
-if __name__ == '__main__':
+def main():
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = MyHIDToyWindow()
@@ -178,3 +178,7 @@ if __name__ == '__main__':
     ui.onReScan()
     MainWindow.show()
     sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()

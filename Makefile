@@ -1,25 +1,24 @@
 APP_NAME     = HIDPyToy
 APP_VERSION  = 0.1.0
-ENTITLEMENTS = entitlements.plist
-SPEC_FILE    = HIDPyToy.spec
 
-SIGNING_ID   ?= Developer ID Application: Your Name (TEAMID)
+SIGNING_ID   ?= Developer ID Application: Tod Kurt (K3Y8NR25XK)
 APPLE_ID     ?= your@apple.id
 APP_PASSWORD ?= @keychain:AC_PASSWORD
 TEAM_ID      ?= YOURTEAMID
 
 # Azure Trusted Signing (Windows) — set via environment or CI secrets
-AZURE_ENDPOINT    ?= https://wus2.codesigning.azure.net/
-AZURE_ACCOUNT     ?= thingm-signing
+AZURE_ENDPOINT     ?= https://wus2.codesigning.azure.net/
+AZURE_ACCOUNT      ?= thingm-signing
 AZURE_CERT_PROFILE ?= ThingMProfile
-AZURE_TENANT_ID   ?=
-AZURE_CLIENT_ID   ?=
+AZURE_TENANT_ID    ?=
+AZURE_CLIENT_ID    ?=
 AZURE_CLIENT_SECRET ?=
 
-HIDTOYWINDOW_PY = src/main/python/HIDToyWindow.py
-HIDTOYWINDOW_UI = src/main/python/HIDToyWindow.ui
+HIDTOYWINDOW_PY = src/hidpytoy/HIDToyWindow.py
+HIDTOYWINDOW_UI = src/hidpytoy/HIDToyWindow.ui
 
-.PHONY: all run regen-ui build-mac build-win build-linux codesign-mac notarize-mac sign-win dist-win dist clean
+.PHONY: all run regen-ui build-mac build-win build-linux \
+        package-mac package-mac-dev sign-win package-win dist clean
 
 all: $(HIDTOYWINDOW_PY)
 
@@ -29,30 +28,28 @@ $(HIDTOYWINDOW_PY): $(HIDTOYWINDOW_UI)
 regen-ui: $(HIDTOYWINDOW_PY)
 
 run: $(HIDTOYWINDOW_PY)
-	python src/main/python/main.py
+	PYTHONPATH=src python -m hidpytoy
 
-build-mac:
-	pyinstaller --clean --noconfirm $(SPEC_FILE)
+build-mac: $(HIDTOYWINDOW_PY)
+	briefcase build macOS
 
-build-win:
-	pyinstaller --clean --noconfirm $(SPEC_FILE)
+build-win: $(HIDTOYWINDOW_PY)
+	briefcase build windows
 
-build-linux:
-	pyinstaller --clean --noconfirm $(SPEC_FILE)
+build-linux: $(HIDTOYWINDOW_PY)
+	briefcase build linux
 
-codesign-mac: build-mac
-	codesign --deep --force --options runtime \
-	  --entitlements $(ENTITLEMENTS) \
-	  --sign "$(SIGNING_ID)" \
-	  dist/$(APP_NAME).app
+# macOS: ad-hoc sign only, no notarization — runs on this machine only
+package-mac-dev: build-mac
+	briefcase package macOS --adhoc-sign
 
-notarize-mac: codesign-mac
-	ditto -c -k --keepParent dist/$(APP_NAME).app dist/$(APP_NAME)-$(APP_VERSION).zip
-	xcrun notarytool submit dist/$(APP_NAME)-$(APP_VERSION).zip \
-	  --apple-id "$(APPLE_ID)" --password "$(APP_PASSWORD)" \
-	  --team-id "$(TEAM_ID)" --wait
-	xcrun stapler staple dist/$(APP_NAME).app
+# macOS: sign + notarize + DMG in one step
+# Notarization credentials must be pre-stored in keychain:
+#   xcrun notarytool store-credentials briefcase-macOS-TEAMID --apple-id ... --password ... --team-id ...
+package-mac: build-mac
+	briefcase package macOS --identity "$(SIGNING_ID)"
 
+# Windows: sign exe with Azure Trusted Signing, then package as MSI
 sign-win: build-win
 	AzureSignTool sign \
 	  --azure-key-vault-url "$(AZURE_ENDPOINT)" \
@@ -62,13 +59,14 @@ sign-win: build-win
 	  --trusted-signing-account-name "$(AZURE_ACCOUNT)" \
 	  --trusted-signing-certificate-profile-name "$(AZURE_CERT_PROFILE)" \
 	  --timestamp-rfc3161 "http://timestamp.acs.microsoft.com" \
-	  dist/$(APP_NAME)/$(APP_NAME).exe
+	  build/$(APP_NAME)/windows/app/$(APP_NAME).exe
 
-dist-win: sign-win
+package-win: sign-win
+	briefcase package windows
 
-dist: notarize-mac
+dist: package-mac
 
 clean:
-	rm -rf dist/ build/
-	rm -rf src/main/python/__pycache__
-	rm -f $(APP_NAME)-$(APP_VERSION).zip
+	rm -rf build/ dist/
+	rm -rf src/hidpytoy/__pycache__
+	rm -f $(HIDTOYWINDOW_PY)
